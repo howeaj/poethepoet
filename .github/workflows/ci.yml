@@ -4,78 +4,102 @@ on: [push, pull_request]
 
 jobs:
 
-  code-quality:
-    name: Check coding standards
-    runs-on: ubuntu-latest
+  # code-quality:
+  #   name: Check coding standards
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
+
+  #     - name: Install poetry
+  #       run: pipx install poetry
+
+  #     - uses: actions/setup-python@v4
+  #       with:
+  #         python-version: 3.9
+  #         cache: poetry
+
+  #     - name: Install dependencies
+  #       run: poetry install
+
+  #     - name: Check code formatting
+  #       run: poetry run poe style
+
+  #     - name: Run linter
+  #       run: poetry run poe lint
+
+  #     - name: Check types
+  #       run: poetry run poe types
+
+  #     - name: Check rst syntax
+  #       run: poetry run poe check-docs
+
+  windows-bug:
+    name: Reproduce windows bug
+    runs-on: Windows-latest
     steps:
       - uses: actions/checkout@v3
 
-      - name: Install poetry
-        run: pipx install poetry
+      - name: Setup poetry
+        run: |
+          pipx install poetry
+          poetry install
 
       - uses: actions/setup-python@v4
         with:
-          python-version: 3.9
+          python-version: '3.9'
           cache: poetry
 
-      - name: Install dependencies
-        run: poetry install
+      - name: install
+        run: pip install .
 
-      - name: Check code formatting
-        run: poetry run poe style
+      - name: check
+        run: poe thing
 
-      - name: Run linter
-        run: poetry run poe lint
 
-      - name: Check types
-        run: poetry run poe types
 
-      - name: Check rst syntax
-        run: poetry run poe check-docs
+  # run-tests:
+  #   name: Run tests
+  #   strategy:
+  #     matrix:
+  #       os: [Ubuntu, MacOS, Windows]
+  #       python-version: ['3.7', '3.8', '3.9', '3.10']
+  #   runs-on: ${{ matrix.os }}-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
 
-  run-tests:
-    name: Run tests
-    strategy:
-      matrix:
-        os: [Ubuntu, MacOS, Windows]
-        python-version: ['3.7', '3.8', '3.9', '3.10']
-    runs-on: ${{ matrix.os }}-latest
-    steps:
-      - uses: actions/checkout@v3
+  #     - name: Install poetry
+  #       run: pipx install poetry
 
-      - name: Install poetry
-        run: pipx install poetry
+  #     - uses: actions/setup-python@v4
+  #       with:
+  #         python-version: ${{ matrix.python-version }}
+  #         cache: poetry
 
-      - uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python-version }}
-          cache: poetry
+  #     - name: Install dependencies
+  #       run: poetry install
 
-      - name: Install dependencies
-        run: poetry install
+  #     - name: Run tests
+  #       run: poetry run pytest -v
 
-      - name: Run tests
-        run: poetry run pytest -v
+  # build-release:
+  #   name: Build and release
+  #   runs-on: ubuntu-latest
+  #   needs: [code-quality, run-tests]
+  #   steps:
+  #     - uses: actions/checkout@v3
 
-  build-release:
-    name: Build and release
-    runs-on: ubuntu-latest
-    needs: [code-quality, run-tests]
-    steps:
-      - uses: actions/checkout@v3
+  #     - name: Install poetry
+  #       run: pipx install poetry
 
-      - name: Install poetry
-        run: pipx install poetry
+  #     - uses: actions/setup-python@v4
+  #       with:
+  #         python-version: 3.9
 
-      - uses: actions/setup-python@v4
-        with:
-          python-version: 3.9
+  #     - name: Build package
+  #       run: poetry build
 
-      - name: Build package
-        run: poetry build
-
-      - name: Publish package to PyPI
-        if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags')
-        run: poetry publish -n
-        env:
-          POETRY_PYPI_TOKEN_PYPI: ${{ secrets.pypi }}
+  #     - name: Publish package to PyPI
+  #       if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags')
+  #       run: poetry publish -n
+  #       env:
+  #         POETRY_PYPI_TOKEN_PYPI: ${{ secrets.pypi }}

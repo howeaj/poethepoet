@@ -39,6 +39,8 @@ poethepoet = "poethepoet.plugin:PoetryPlugin"
 
 [tool.poe.tasks]
 
+thing = ["lint", "types"]
+
   [tool.poe.tasks.format]
   help = "Run black on the code base"
   cmd  = "black ."
